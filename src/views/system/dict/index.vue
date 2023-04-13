@@ -103,9 +103,9 @@
 
       <el-table v-loading="loading" :data="typeList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="字典编号" align="center" prop="dictId" />
-         <el-table-column label="字典名称" align="center" prop="dictName" :show-overflow-tooltip="true"/>
-         <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
+         <el-table-column label="字典编号" width="80" align="center" prop="dictId" />
+         <el-table-column label="字典名称" width="180" align="center" prop="dictName" :show-overflow-tooltip="true"/>
+         <el-table-column label="字典类型" width="180" align="center" :show-overflow-tooltip="true">
             <template #default="scope">
                <router-link :to="'/system/dict-data/index/' + scope.row.dictId" class="link-type">
                   <span>{{ scope.row.dictType }}</span>
@@ -117,13 +117,15 @@
                <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
             </template>
          </el-table-column>
-         <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+        <el-table-column label="关联表名" width="150" align="center" prop="linkTable" :show-overflow-tooltip="true" />
+        <el-table-column label="关联字段" width="150" align="center" prop="linkColumn" :show-overflow-tooltip="true" />
+         <el-table-column label="备注" width="200" align="center" prop="remark" :show-overflow-tooltip="true" />
          <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="center" width="160" fixed="right" class-name="small-padding fixed-width">
             <template #default="scope">
                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:dict:edit']">修改</el-button>
                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dict:remove']">删除</el-button>
@@ -148,12 +150,18 @@
             <el-form-item label="字典类型" prop="dictType">
                <el-input v-model="form.dictType" placeholder="请输入字典类型" />
             </el-form-item>
+           <el-form-item label="关联表名" prop="linkTable">
+             <el-input v-model="form.linkTable" placeholder="请输入关联表名" />
+           </el-form-item>
+           <el-form-item label="关联字段" prop="linkColumn">
+             <el-input v-model="form.linkColumn" placeholder="请输入关联字段" />
+           </el-form-item>
             <el-form-item label="状态" prop="status">
                <el-radio-group v-model="form.status">
                   <el-radio
                      v-for="dict in sys_normal_disable"
-                     :key="dict.value"
-                     :label="dict.value"
+                     :key="parseInt(dict.value)"
+                     :label="parseInt(dict.value)"
                   >{{ dict.label }}</el-radio>
                </el-radio-group>
             </el-form-item>
@@ -226,7 +234,9 @@ function reset() {
     dictId: undefined,
     dictName: undefined,
     dictType: undefined,
-    status: "0",
+    linkTable: undefined,
+    linkColumn: undefined,
+    status: 0,
     remark: undefined
   };
   proxy.resetForm("dictRef");

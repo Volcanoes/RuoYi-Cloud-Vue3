@@ -304,6 +304,7 @@
             :disabled="upload.isUploading"
             :on-progress="handleFileUploadProgress"
             :on-success="handleFileSuccess"
+            :on-error="handleFileError"
             :auto-upload="false"
             drag
          >
@@ -332,6 +333,7 @@
 <script setup name="User">
 import { getToken } from "@/utils/auth";
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user";
+import {  ElMessage } from 'element-plus'
 
 const router = useRouter();
 const { proxy } = getCurrentInstance();
@@ -421,6 +423,8 @@ function getList() {
     loading.value = false;
     userList.value = res.rows;
     total.value = res.total;
+  }).catch(() => {
+    loading.value = false;
   });
 };
 /** 节点单击事件 */
@@ -527,6 +531,14 @@ const handleFileSuccess = (response, file, fileList) => {
   proxy.$refs["uploadRef"].handleRemove(file);
   proxy.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.msg + "</div>", "导入结果", { dangerouslyUseHTMLString: true });
   getList();
+};
+
+/** 文件上传失败处理 */
+const handleFileError = (response, file) => {
+  upload.open = false;
+  upload.isUploading = false;
+  proxy.$refs["uploadRef"].handleRemove(file);
+  ElMessage.error(JSON.parse(response.message).msg);
 };
 /** 提交上传文件 */
 function submitFileForm() {
