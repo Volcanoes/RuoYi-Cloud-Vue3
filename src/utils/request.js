@@ -116,8 +116,9 @@ export function download(url, params, filename, config) {
     }
     downloadLoadingInstance.close();
   }).catch((r) => {
-    console.error(r)
-    ElMessage.error('下载文件出现错误，请联系管理员！')
+    // console.error(r)
+    //不需要弹出，拦截器已做错误输出
+    // ElMessage.error('下载文件出现错误，请联系管理员！')
     downloadLoadingInstance.close();
   })
 }
@@ -149,7 +150,8 @@ export function dealErrorReturn(code ,msg, res){
     ElMessage({ message: msg, type: 'warning' })
     return Promise.reject(new Error(msg))
   } else if (code !== 200) {
-    ElNotification.error({ title: msg })
+    ElMessage({ message: msg, type: 'error' })
+    //ElNotification.error({ title: msg })
     return Promise.reject('error')
   } else {
     return  Promise.resolve(res.data)

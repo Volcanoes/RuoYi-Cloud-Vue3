@@ -71,7 +71,7 @@
           <tree-select
             v-model:value="info.parentMenuId"
             :options="menuOptions"
-            :objMap="{ value: 'menuId', label: 'menuName', children: 'children' }"
+            :objMap="{ value: 'id', label: 'menuName', children: 'children' }"
             placeholder="请选择系统菜单"
           />
         </el-form-item>
@@ -269,7 +269,7 @@ function setSubTableColumns(value) {
 /** 查询菜单下拉树结构 */
 function getMenuTreeselect() {
   listMenu().then(response => {
-    menuOptions.value = proxy.handleTree(response.data, "menuId");
+    menuOptions.value = proxy.handleTree(response.data, "id");
   });
 }
 

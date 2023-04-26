@@ -51,7 +51,7 @@
          v-if="refreshTable"
          v-loading="loading"
          :data="deptList"
-         row-key="deptId"
+         row-key="id"
          :default-expand-all="isExpandAll"
          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
@@ -85,8 +85,8 @@
                      <el-tree-select
                         v-model="form.parentId"
                         :data="deptOptions"
-                        :props="{ value: 'deptId', label: 'deptName', children: 'children' }"
-                        value-key="deptId"
+                        :props="{ value: 'id', label: 'deptName', children: 'children' }"
+                        value-key="id"
                         placeholder="选择上级部门"
                         check-strictly
                      />
@@ -176,7 +176,7 @@ const { queryParams, form, rules } = toRefs(data);
 function getList() {
   loading.value = true;
   listDept(queryParams.value).then(response => {
-    deptList.value = proxy.handleTree(response.data, "deptId");
+    deptList.value = proxy.handleTree(response.data, "id");
     loading.value = false;
   });
 }
@@ -188,7 +188,7 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    deptId: undefined,
+    id: undefined,
     parentId: undefined,
     deptName: undefined,
     orderNum: 0,
@@ -212,10 +212,10 @@ function resetQuery() {
 function handleAdd(row) {
   reset();
   listDept().then(response => {
-    deptOptions.value = proxy.handleTree(response.data, "deptId");
+    deptOptions.value = proxy.handleTree(response.data, "id");
   });
   if (row != undefined) {
-    form.value.parentId = row.deptId;
+    form.value.parentId = row.id;
   }
   open.value = true;
   title.value = "添加部门";
@@ -231,10 +231,10 @@ function toggleExpandAll() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  listDeptExcludeChild(row.deptId).then(response => {
-    deptOptions.value = proxy.handleTree(response.data, "deptId");
+  listDeptExcludeChild(row.id).then(response => {
+    deptOptions.value = proxy.handleTree(response.data, "id");
   });
-  getDept(row.deptId).then(response => {
+  getDept(row.id).then(response => {
     form.value = response.data;
     open.value = true;
     title.value = "修改部门";
@@ -244,7 +244,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["deptRef"].validate(valid => {
     if (valid) {
-      if (form.value.deptId != undefined) {
+      if (form.value.id != undefined) {
         updateDept(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -263,7 +263,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   proxy.$modal.confirm('是否确认删除名称为"' + row.deptName + '"的数据项?').then(function() {
-    return delDept(row.deptId);
+    return delDept(row.id);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");

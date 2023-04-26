@@ -98,7 +98,7 @@
 
       <el-table v-loading="loading" :data="jobLogList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="日志编号" width="80" align="center" prop="jobLogId" />
+         <el-table-column label="日志编号" width="80" align="center" prop="id" />
          <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
          <el-table-column label="任务组名" align="center" prop="jobGroup" :show-overflow-tooltip="true">
             <template #default="scope">
@@ -137,7 +137,7 @@
          <el-form :model="form" label-width="100px">
             <el-row>
                <el-col :span="12">
-                  <el-form-item label="日志序号：">{{ form.jobLogId }}</el-form-item>
+                  <el-form-item label="日志序号：">{{ form.id }}</el-form-item>
                   <el-form-item label="任务名称：">{{ form.jobName }}</el-form-item>
                </el-col>
                <el-col :span="12">
@@ -227,7 +227,7 @@ function resetQuery() {
 }
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.jobLogId);
+  ids.value = selection.map(item => item.id);
   multiple.value = !selection.length;
 }
 /** 详细按钮操作 */
@@ -261,9 +261,9 @@ function handleExport() {
 }
 
 (() => {
-  const jobId = route.params && route.params.jobId;
-  if (jobId !== undefined && jobId != 0) {
-    getJob(jobId).then(response => {
+  const id = route.params && route.params.id;
+  if (id !== undefined && id != 0) {
+    getJob(id).then(response => {
       queryParams.value.jobName = response.data.jobName;
       queryParams.value.jobGroup = response.data.jobGroup;
       getList();

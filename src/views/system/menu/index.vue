@@ -51,14 +51,15 @@
          v-if="refreshTable"
          v-loading="loading"
          :data="menuList"
-         row-key="menuId"
+         row-key="id"
          :default-expand-all="isExpandAll"
          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
          <el-table-column prop="menuName" label="菜单名称" :show-overflow-tooltip="true" width="160"></el-table-column>
          <el-table-column prop="icon" label="图标" align="center" width="100">
             <template #default="scope">
-               <svg-icon :icon-class="scope.row.icon" />
+               <api
+                   views-icon :icon-class="scope.row.icon" />
             </template>
          </el-table-column>
          <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
@@ -92,8 +93,8 @@
                      <el-tree-select
                         v-model="form.parentId"
                         :data="menuOptions"
-                        :props="{ value: 'menuId', label: 'menuName', children: 'children' }"
-                        value-key="menuId"
+                        :props="{ value: 'id', label: 'menuName', children: 'children' }"
+                        value-key="id"
                         placeholder="选择上级菜单"
                         check-strictly
                      />
@@ -154,8 +155,8 @@
                         </span>
                      </template>
                      <el-radio-group v-model="form.isFrame">
-                        <el-radio label="0">是</el-radio>
-                        <el-radio label="1">否</el-radio>
+                        <el-radio :label="0">是</el-radio>
+                        <el-radio :label="1">否</el-radio>
                      </el-radio-group>
                   </el-form-item>
                </el-col>
@@ -222,8 +223,8 @@
                         </span>
                      </template>
                      <el-radio-group v-model="form.isCache">
-                        <el-radio label="0">缓存</el-radio>
-                        <el-radio label="1">不缓存</el-radio>
+                        <el-radio :label="0">缓存</el-radio>
+                        <el-radio :label="1">不缓存</el-radio>
                      </el-radio-group>
                   </el-form-item>
                </el-col>
@@ -240,8 +241,8 @@
                      <el-radio-group v-model="form.visible">
                         <el-radio
                            v-for="dict in sys_show_hide"
-                           :key="dict.value"
-                           :label="dict.value"
+                           :key="parseInt(dict.value)"
+                           :label="parseInt(dict.value)"
                         >{{ dict.label }}</el-radio>
                      </el-radio-group>
                   </el-form-item>
@@ -259,8 +260,8 @@
                      <el-radio-group v-model="form.status">
                         <el-radio
                            v-for="dict in sys_normal_disable"
-                           :key="dict.value"
-                           :label="dict.value"
+                           :key="parseInt(dict.value)"
+                           :label="parseInt(dict.value)"
                         >{{ dict.label }}</el-radio>
                      </el-radio-group>
                   </el-form-item>
@@ -316,7 +317,7 @@ const { queryParams, form, rules } = toRefs(data);
 function getList() {
   loading.value = true;
   listMenu(queryParams.value).then(response => {
-    menuList.value = proxy.handleTree(response.data, "menuId");
+    menuList.value = proxy.handleTree(response.data, "id");
     loading.value = false;
   });
 }
@@ -324,8 +325,8 @@ function getList() {
 function getTreeselect() {
   menuOptions.value = [];
   listMenu().then(response => {
-    const menu = { menuId: 0, menuName: "主类目", children: [] };
-    menu.children = proxy.handleTree(response.data, "menuId");
+    const menu = { id: 0, menuName: "主类目", children: [] };
+    menu.children = proxy.handleTree(response.data, "id");
     menuOptions.value.push(menu);
   });
 }
@@ -337,16 +338,16 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    menuId: undefined,
+    id: undefined,
     parentId: 0,
     menuName: undefined,
     icon: undefined,
     menuType: "M",
     orderNum: undefined,
-    isFrame: "1",
-    isCache: "0",
-    visible: "0",
-    status: "0"
+    isFrame: 1,
+    isCache: 0,
+    visible: 0,
+    status: 0
   };
   proxy.resetForm("menuRef");
 }
@@ -381,8 +382,8 @@ function resetQuery() {
 function handleAdd(row) {
   reset();
   getTreeselect();
-  if (row != null && row.menuId) {
-    form.value.parentId = row.menuId;
+  if (row != null && row.id) {
+    form.value.parentId = row.id;
   } else {
     form.value.parentId = 0;
   }
@@ -401,7 +402,7 @@ function toggleExpandAll() {
 async function handleUpdate(row) {
   reset();
   await getTreeselect();
-  getMenu(row.menuId).then(response => {
+  getMenu(row.id).then(response => {
     form.value = response.data;
     open.value = true;
     title.value = "修改菜单";
@@ -411,7 +412,7 @@ async function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["menuRef"].validate(valid => {
     if (valid) {
-      if (form.value.menuId != undefined) {
+      if (form.value.id != undefined) {
         updateMenu(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -430,7 +431,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   proxy.$modal.confirm('是否确认删除名称为"' + row.menuName + '"的数据项?').then(function() {
-    return delMenu(row.menuId);
+    return delMenu(row.id);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
