@@ -32,8 +32,13 @@ const useUserStore = defineStore(
       },
       // 获取用户信息
       getInfo() {
+        const sysParams = {
+          systemCode: 'SYS_ADMIN',
+          moduleCode: 'BACKSTAGE_MANAGE',
+          terminalType: 'WEB'
+        }
         return new Promise((resolve, reject) => {
-          getInfo().then(res => {
+          getInfo(sysParams).then(res => {
             const user = res.user
             const avatar = (user.avatar == "" || user.avatar == null) ? defAva : user.avatar;
 

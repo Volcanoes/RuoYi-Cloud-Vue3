@@ -10,9 +10,9 @@ export function listPost(query) {
 }
 
 // 查询岗位详细
-export function getPost(postId) {
+export function getPost(id) {
   return request({
-    url: '/system/post/' + postId,
+    url: '/system/post/' + id,
     method: 'get'
   })
 }
@@ -36,9 +36,9 @@ export function updatePost(data) {
 }
 
 // 删除岗位
-export function delPost(postId) {
+export function delPost(id) {
   return request({
-    url: '/system/post/' + postId,
+    url: '/system/post/' + id,
     method: 'delete'
   })
 }

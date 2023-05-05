@@ -33,10 +33,11 @@ export function refreshToken() {
 }
 
 // 获取用户详细信息
-export function getInfo() {
+export function getInfo(sysParams) {
   return request({
     url: '/system/user/getInfo',
-    method: 'get'
+    method: 'get',
+    params: sysParams
   })
 }
 

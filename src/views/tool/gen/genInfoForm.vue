@@ -71,6 +71,7 @@
           <tree-select
             v-model:value="info.parentMenuId"
             :options="menuOptions"
+            v-if="menuOptions.length"
             :objMap="{ value: 'id', label: 'menuName', children: 'children' }"
             placeholder="请选择系统菜单"
           />
