@@ -80,19 +80,33 @@
       <el-table-column label="主键" align="center" prop="id" v-if="columns[0].visible"/>
     <el-table-column label="企业编码" align="center" prop="orgCode" width="120" v-if="columns[1].visible"/>
     <el-table-column label="企业名称" align="center" prop="orgName" width="120" v-if="columns[2].visible"/>
-    <el-table-column label="企业图标" align="center" prop="icon" v-if="columns[3].visible"/>
+      <el-table-column label="企业图标" align="center" prop="icon" width="120" v-if="columns[3].visible">
+        <template #default="scope">
+          <image-preview :src="scope.row.icon" :width="30" :height="30"/>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="status" v-if="columns[4].visible">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[5].visible"/>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180" v-if="columns[5].visible">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:org:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:org:remove']">删除</el-button>
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="更新时间" align="center" prop="updateTime" width="180" v-if="columns[6].visible">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[7].visible"/>
+    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
+      <template #default="scope">
+        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:org:edit']">修改</el-button>
+        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:org:remove']">删除</el-button>
+      </template>
+    </el-table-column>
     </el-table>
     
     <pagination
@@ -113,17 +127,16 @@
           <el-input v-model="form.orgName" placeholder="请输入企业名称" />
         </el-form-item>
         <el-form-item label="企业图标" prop="icon">
-          <el-input v-model="form.icon" placeholder="请输入企业图标" />
+          <image-upload v-model="form.icon"/>
         </el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option
+          <el-radio-group v-model="form.status">
+            <el-radio
               v-for="dict in sys_normal_disable"
               :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-            ></el-option>
-          </el-select>
+              :label="parseInt(dict.value)"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
@@ -161,7 +174,9 @@ const columns = ref([
   {key: 2, label: `企业名称`, visible: true},
   {key: 3, label: `企业图标`, visible: true},
   {key: 4, label: `状态`, visible: true},
-  {key: 5, label: `备注`, visible: true},
+  {key: 5, label: `创建时间`, visible: true},
+  {key: 6, label: `更新时间`, visible: true},
+  {key: 7, label: `备注`, visible: true},
 ]);
 
 const data = reactive({

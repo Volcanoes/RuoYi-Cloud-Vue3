@@ -33,9 +33,13 @@ const usePermissionStore = defineStore(
         this.sidebarRouters = routes
       },
       generateRoutes(roles) {
+        const sysParams = {
+          systemCode: 'SYS_ADMIN',
+          moduleCode: 'BACKSTAGE_MANAGE'
+        }
         return new Promise(resolve => {
           // 向后端请求路由数据
-          getRouters().then(res => {
+          getRouters(sysParams).then(res => {
             const sdata = JSON.parse(JSON.stringify(res.data))
             const rdata = JSON.parse(JSON.stringify(res.data))
             const defaultData = JSON.parse(JSON.stringify(res.data))

@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/login'
+import { login, logout, getInfo,chooseCompany } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import defAva from '@/assets/images/profile.jpg'
 
@@ -24,7 +24,18 @@ const useUserStore = defineStore(
             let data = res.data
             setToken(data.access_token)
             this.token = data.access_token
-            resolve()
+            //设置登录的企业和公司信息，暂时先写死
+            const chooseParams = {
+              orgId: 1,
+              companyId: 1,
+              terminalType: 'WEB'
+            }
+            chooseCompany(chooseParams).then(res1 => {
+              resolve()
+            }).catch(error => {
+              removeToken()
+              reject(error)
+            })
           }).catch(error => {
             reject(error)
           })
@@ -34,8 +45,7 @@ const useUserStore = defineStore(
       getInfo() {
         const sysParams = {
           systemCode: 'SYS_ADMIN',
-          moduleCode: 'BACKSTAGE_MANAGE',
-          terminalType: 'WEB'
+          moduleCode: 'BACKSTAGE_MANAGE'
         }
         return new Promise((resolve, reject) => {
           getInfo(sysParams).then(res => {

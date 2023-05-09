@@ -60,3 +60,11 @@ export function getCodeImg() {
     timeout: 20000
   })
 }
+// 选择企业和公司信息
+export function chooseCompany(chooseParams) {
+  return request({
+    url: '/system/user/choose-login-company',
+    method: 'get',
+    params: chooseParams
+  })
+}

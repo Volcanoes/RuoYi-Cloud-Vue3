@@ -1,18 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
-      <el-form-item label="系统编码" prop="systemCode">
+      <el-form-item label="终端类型名称" prop="typeName">
         <el-input
-          v-model="queryParams.systemCode"
-          placeholder="请输入系统编码"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="系统名称" prop="systemName">
-        <el-input
-          v-model="queryParams.systemName"
-          placeholder="请输入系统名称"
+          v-model="queryParams.typeName"
+          placeholder="请输入终端类型名称"
           clearable
           @keyup.enter="handleQuery"
         />
@@ -40,7 +32,7 @@
           plain
           icon="Plus"
           @click="handleAdd"
-          v-hasPermi="['system:system:add']"
+          v-hasPermi="['system:terminaltype:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -50,7 +42,7 @@
           icon="Edit"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:system:edit']"
+          v-hasPermi="['system:terminaltype:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -60,7 +52,7 @@
           icon="Delete"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:system:remove']"
+          v-hasPermi="['system:terminaltype:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -69,28 +61,27 @@
           plain
           icon="Download"
           @click="handleExport"
-          v-hasPermi="['system:system:export']"
+          v-hasPermi="['system:terminaltype:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="systemList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="terminaltypeList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="columns[0].visible"/>
-    <el-table-column label="系统编码" align="center" prop="systemCode" width="120" v-if="columns[1].visible"/>
-    <el-table-column label="系统名称" align="center" prop="systemName" width="120" v-if="columns[2].visible"/>
+    <el-table-column label="终端类型编码" align="center" prop="typeCode" width="120" v-if="columns[1].visible"/>
+    <el-table-column label="终端类型名称" align="center" prop="typeName" width="120" v-if="columns[2].visible"/>
       <el-table-column label="状态" align="center" prop="status" v-if="columns[3].visible">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-    <el-table-column label="展示顺序" align="center" prop="sort" v-if="columns[4].visible"/>
-    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[5].visible"/>
+    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[4].visible"/>
     <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
       <template #default="scope">
-        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:system:edit']">修改</el-button>
-        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:system:remove']">删除</el-button>
+        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:terminaltype:edit']">修改</el-button>
+        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:terminaltype:remove']">删除</el-button>
       </template>
     </el-table-column>
     </el-table>
@@ -103,14 +94,11 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改系统管理对话框 -->
+    <!-- 添加或修改终端类型对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="systemRef" :model="form" :rules="rules" label-width="150px">
-        <el-form-item label="系统编码" prop="systemCode">
-          <el-input v-model="form.systemCode" placeholder="请输入系统编码" />
-        </el-form-item>
-        <el-form-item label="系统名称" prop="systemName">
-          <el-input v-model="form.systemName" placeholder="请输入系统名称" />
+      <el-form ref="terminaltypeRef" :model="form" :rules="rules" label-width="150px">
+        <el-form-item label="终端类型名称" prop="typeName">
+          <el-input v-model="form.typeName" placeholder="请输入终端类型名称" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
@@ -120,9 +108,6 @@
               :label="parseInt(dict.value)"
             >{{dict.label}}</el-radio>
           </el-radio-group>
-        </el-form-item>
-        <el-form-item label="展示顺序" prop="sort">
-          <el-input v-model="form.sort" placeholder="请输入展示顺序" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请输入备注" />
@@ -138,13 +123,13 @@
   </div>
 </template>
 
-<script setup name="System">
-    import {listSystem, addSystem, delSystem, getSystem, updateSystem } from "@/api/system/system";
+<script setup name="Terminaltype">
+    import {listTerminaltype, addTerminaltype, delTerminaltype, getTerminaltype, updateTerminaltype } from "@/api/system/terminaltype";
 
     const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
-const systemList = ref([]);
+const terminaltypeList = ref([]);
 const open = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -156,11 +141,10 @@ const title = ref("");
 // 列显隐信息
 const columns = ref([
   {key: 0, label: `主键`, visible: true},
-  {key: 1, label: `系统编码`, visible: true},
-  {key: 2, label: `系统名称`, visible: true},
+  {key: 1, label: `终端类型编码`, visible: true},
+  {key: 2, label: `终端类型名称`, visible: true},
   {key: 3, label: `状态`, visible: true},
-  {key: 4, label: `展示顺序`, visible: true},
-  {key: 5, label: `备注`, visible: true},
+  {key: 4, label: `备注`, visible: true},
 ]);
 
 const data = reactive({
@@ -168,30 +152,27 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    systemCode: null,
-    systemName: null,
+    typeCode: null,
+    typeName: null,
     status: null,
   },
   rules: {
-    systemCode: [
-      { required: true, message: "系统编码不能为空", trigger: "blur" }
+    typeCode: [
+      { required: true, message: "终端类型编码不能为空", trigger: "blur" }
     ],
-    systemName: [
-      { required: true, message: "系统名称不能为空", trigger: "blur" }
-    ],
-    status: [
-      { required: true, message: "状态不能为空", trigger: "change" }
+    typeName: [
+      { required: true, message: "终端类型名称不能为空", trigger: "blur" }
     ],
   }
 });
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询系统管理列表 */
+/** 查询终端类型列表 */
 function getList() {
   loading.value = true;
-  listSystem(queryParams.value).then(response => {
-    systemList.value = response.rows;
+  listTerminaltype(queryParams.value).then(response => {
+    terminaltypeList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
@@ -207,17 +188,16 @@ function cancel() {
 function reset() {
   form.value = {
     id: null,
-    systemCode: null,
-    systemName: null,
+    typeCode: null,
+    typeName: null,
     status: null,
-    sort: null,
     createBy: null,
     createTime: null,
     updateBy: null,
     updateTime: null,
     remark: null
   };
-  proxy.resetForm("systemRef");
+  proxy.resetForm("terminaltypeRef");
 }
 
 /** 搜索按钮操作 */
@@ -243,32 +223,32 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加系统管理";
+  title.value = "添加终端类型";
 }
 
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
   const _id = row.id || ids.value
-  getSystem(_id).then(response => {
+  getTerminaltype(_id).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改系统管理";
+    title.value = "修改终端类型";
   });
 }
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["systemRef"].validate(valid => {
+  proxy.$refs["terminaltypeRef"].validate(valid => {
     if (valid) {
       if (form.value.id != null) {
-        updateSystem(form.value).then(response => {
+        updateTerminaltype(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        addSystem(form.value).then(response => {
+        addTerminaltype(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -281,8 +261,8 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除系统管理编号为"' + _ids + '"的数据项？').then(function() {
-    return delSystem(_ids);
+  proxy.$modal.confirm('是否确认删除终端类型编号为"' + _ids + '"的数据项？').then(function() {
+    return delTerminaltype(_ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -291,9 +271,9 @@ function handleDelete(row) {
 
 /** 导出按钮操作 */
 function handleExport() {
-  proxy.download('system/system/export', {
+  proxy.download('system/terminaltype/export', {
     ...queryParams.value
-  }, `system_${new Date().getTime()}.xlsx`)
+  }, `terminaltype_${new Date().getTime()}.xlsx`)
 }
 
 getList();
