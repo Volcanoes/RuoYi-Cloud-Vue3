@@ -3,27 +3,27 @@
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="系统编码" prop="systemCode">
         <el-input
-          v-model="queryParams.systemCode"
-          placeholder="请输入系统编码"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.systemCode"
+            placeholder="请输入系统编码"
+            clearable
+            @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="系统名称" prop="systemName">
         <el-input
-          v-model="queryParams.systemName"
-          placeholder="请输入系统名称"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.systemName"
+            placeholder="请输入系统名称"
+            clearable
+            @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option
-            v-for="dict in sys_normal_disable"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in sys_normal_disable"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -36,40 +36,40 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:system:add']"
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['system:system:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:system:edit']"
+            type="success"
+            plain
+            icon="Edit"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['system:system:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:system:remove']"
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['system:system:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['system:system:export']"
+            type="warning"
+            plain
+            icon="Download"
+            @click="handleExport"
+            v-hasPermi="['system:system:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
@@ -78,55 +78,77 @@
     <el-table v-loading="loading" :data="systemList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="columns[0].visible"/>
-    <el-table-column label="系统编码" align="center" prop="systemCode" width="120" v-if="columns[1].visible"/>
-    <el-table-column label="系统名称" align="center" prop="systemName" width="120" v-if="columns[2].visible"/>
+      <el-table-column label="系统编码" align="center" prop="systemCode" width="120" v-if="columns[1].visible"/>
+      <el-table-column label="系统名称" align="center" prop="systemName" width="120" v-if="columns[2].visible"/>
       <el-table-column label="状态" align="center" prop="status" v-if="columns[3].visible">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-    <el-table-column label="展示顺序" align="center" prop="sort" v-if="columns[4].visible"/>
-    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[5].visible"/>
-    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
-      <template #default="scope">
-        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:system:edit']">修改</el-button>
-        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:system:remove']">删除</el-button>
-      </template>
-    </el-table-column>
+      <el-table-column label="展示顺序" align="center" prop="sort" v-if="columns[4].visible"/>
+      <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[5].visible"/>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
+        <template #default="scope">
+          <el-tooltip content="修改" placement="top" >
+            <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:system:edit']"></el-button>
+          </el-tooltip>
+          <el-tooltip content="删除" placement="top" >
+            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:system:remove']"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
     </el-table>
-    
+
     <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total>0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改系统管理对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="systemRef" :model="form" :rules="rules" label-width="150px">
-        <el-form-item label="系统编码" prop="systemCode">
-          <el-input v-model="form.systemCode" placeholder="请输入系统编码" />
-        </el-form-item>
-        <el-form-item label="系统名称" prop="systemName">
-          <el-input v-model="form.systemName" placeholder="请输入系统名称" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in sys_normal_disable"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="展示顺序" prop="sort">
-          <el-input v-model="form.sort" placeholder="请输入展示顺序" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
+      <el-form ref="systemRef" :model="form" :rules="rules" label-width="100px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="系统编码" prop="systemCode">
+              <el-input v-model="form.systemCode" placeholder="请输入系统编码" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="系统名称" prop="systemName">
+              <el-input v-model="form.systemName" placeholder="请输入系统名称" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="状态" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio
+                    v-for="dict in sys_normal_disable"
+                    :key="dict.value"
+                    :label="parseInt(dict.value)"
+                >{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="展示顺序" prop="sort">
+              <el-input v-model="form.sort" placeholder="请输入展示顺序" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -139,9 +161,9 @@
 </template>
 
 <script setup name="System">
-    import {listSystem, addSystem, delSystem, getSystem, updateSystem } from "@/api/system/system";
+import {listSystem, addSystem, delSystem, getSystem, updateSystem } from "@/api/system/system";
 
-    const { proxy } = getCurrentInstance();
+const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const systemList = ref([]);

@@ -42,3 +42,10 @@ export function delTerminaltype(id) {
     method: 'delete'
   })
 }
+//查询所有终端类型
+export function listAllTerminal() {
+  return request({
+    url: '/system/terminaltype/list-all',
+    method: 'get'
+  })
+}

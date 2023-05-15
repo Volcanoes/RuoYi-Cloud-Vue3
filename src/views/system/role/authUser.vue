@@ -2,9 +2,9 @@
 <template>
    <div class="app-container">
       <el-form :model="queryParams" ref="queryRef" v-show="showSearch" :inline="true">
-         <el-form-item label="用户名称" prop="userName">
+         <el-form-item label="用户名称" prop="name">
             <el-input
-               v-model="queryParams.userName"
+               v-model="queryParams.name"
                placeholder="请输入用户名称"
                clearable
                style="width: 240px"
@@ -57,12 +57,17 @@
          <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
       </el-row>
 
-      <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="accountList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
-         <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
-         <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
-         <el-table-column label="手机" prop="phone" :show-overflow-tooltip="true" />
+         <el-table-column label="账户名称" prop="name" :show-overflow-tooltip="true" />
+         <el-table-column label="工号" prop="workNo" :show-overflow-tooltip="true" />
+         <el-table-column label="工作邮箱" prop="workEmail" :show-overflow-tooltip="true" />
+         <el-table-column label="手机号码" prop="phone" :show-overflow-tooltip="true" />
+         <el-table-column label="头像" align="center" prop="avatar" width="120">
+           <template #default="scope">
+             <image-preview :src="scope.row.avatar" :width="30" :height="30"/>
+           </template>
+         </el-table-column>
          <el-table-column label="状态" align="center" prop="status">
             <template #default="scope">
                <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
@@ -99,7 +104,7 @@ const route = useRoute();
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
-const userList = ref([]);
+const accountList = ref([]);
 const loading = ref(true);
 const showSearch = ref(true);
 const multiple = ref(true);
@@ -110,7 +115,7 @@ const queryParams = reactive({
   pageNum: 1,
   pageSize: 10,
   roleId: route.params.roleId,
-  userName: undefined,
+  name: undefined,
   phone: undefined,
 });
 
@@ -118,7 +123,7 @@ const queryParams = reactive({
 function getList() {
   loading.value = true;
   allocatedUserList(queryParams).then(response => {
-    userList.value = response.rows;
+    accountList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
@@ -149,7 +154,7 @@ function openSelectUser() {
 }
 /** 取消授权按钮操作 */
 function cancelAuthUser(row) {
-  proxy.$modal.confirm('确认要取消该用户"' + row.userName + '"角色吗？').then(function () {
+  proxy.$modal.confirm('确认要取消该用户"' + row.name + '"角色吗？').then(function () {
     return authUserCancel({ userId: row.userId, roleId: queryParams.roleId });
   }).then(() => {
     getList();

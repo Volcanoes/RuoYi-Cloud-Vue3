@@ -2,9 +2,9 @@
    <!-- 授权用户 -->
    <el-dialog title="选择用户" v-model="visible" width="800px" top="5vh" append-to-body>
       <el-form :model="queryParams" ref="queryRef" :inline="true">
-         <el-form-item label="用户名称" prop="userName">
+         <el-form-item label="用户名称" prop="name">
             <el-input
-               v-model="queryParams.userName"
+               v-model="queryParams.name"
                placeholder="请输入用户名称"
                clearable
                style="width: 200px"
@@ -26,12 +26,17 @@
          </el-form-item>
       </el-form>
       <el-row>
-         <el-table @row-click="clickRow" ref="refTable" :data="userList" @selection-change="handleSelectionChange" height="260px">
+         <el-table @row-click="clickRow" ref="refTable" :data="accountList" @selection-change="handleSelectionChange" height="260px">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column label="用户名称" prop="userName" :show-overflow-tooltip="true" />
-            <el-table-column label="用户昵称" prop="nickName" :show-overflow-tooltip="true" />
-            <el-table-column label="邮箱" prop="email" :show-overflow-tooltip="true" />
-            <el-table-column label="手机" prop="phone" :show-overflow-tooltip="true" />
+           <el-table-column label="账户名称" prop="name" :show-overflow-tooltip="true" />
+           <el-table-column label="工号" prop="workNo" :show-overflow-tooltip="true" />
+           <el-table-column label="工作邮箱" prop="workEmail" :show-overflow-tooltip="true" />
+           <el-table-column label="手机号码" prop="phone" :show-overflow-tooltip="true" />
+           <el-table-column label="头像" align="center" prop="avatar" width="120">
+             <template #default="scope">
+               <image-preview :src="scope.row.avatar" :width="30" :height="30"/>
+             </template>
+           </el-table-column>
             <el-table-column label="状态" align="center" prop="status">
                <template #default="scope">
                   <dict-tag :options="sys_normal_disable" :value="scope.row.status" />
@@ -72,7 +77,7 @@ const props = defineProps({
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
-const userList = ref([]);
+const accountList = ref([]);
 const visible = ref(false);
 const total = ref(0);
 const userIds = ref([]);
@@ -81,7 +86,7 @@ const queryParams = reactive({
   pageNum: 1,
   pageSize: 10,
   roleId: undefined,
-  userName: undefined,
+  name: undefined,
   phone: undefined
 });
 
@@ -102,7 +107,7 @@ function handleSelectionChange(selection) {
 // 查询表数据
 function getList() {
   unallocatedUserList(queryParams).then(res => {
-    userList.value = res.rows;
+    accountList.value = res.rows;
     total.value = res.total;
   });
 }

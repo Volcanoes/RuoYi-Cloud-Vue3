@@ -42,3 +42,29 @@ export function delAccount(id) {
     method: 'delete'
   })
 }
+
+// 查询授权角色
+export function getAuthRole(accountId) {
+  return request({
+    url: '/system/account/auth-role/' + accountId,
+    method: 'get'
+  })
+}
+
+// 保存授权角色
+export function updateAuthRole(data) {
+  return request({
+    url: '/system/account/auth-role',
+    method: 'put',
+    params: data
+  })
+}
+
+
+// 查询部门下拉树结构
+export function deptTreeSelect() {
+  return request({
+    url: '/system/account/deptTree',
+    method: 'get'
+  })
+}

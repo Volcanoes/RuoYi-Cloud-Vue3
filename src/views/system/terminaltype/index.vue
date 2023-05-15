@@ -1,21 +1,29 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+      <el-form-item label="终端类型编码" prop="typeCode">
+        <el-input
+            v-model="queryParams.typeCode"
+            placeholder="请输入终端类型编码"
+            clearable
+            @keyup.enter="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="终端类型名称" prop="typeName">
         <el-input
-          v-model="queryParams.typeName"
-          placeholder="请输入终端类型名称"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.typeName"
+            placeholder="请输入终端类型名称"
+            clearable
+            @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option
-            v-for="dict in sys_normal_disable"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in sys_normal_disable"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -28,40 +36,40 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:terminaltype:add']"
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['system:terminaltype:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:terminaltype:edit']"
+            type="success"
+            plain
+            icon="Edit"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['system:terminaltype:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:terminaltype:remove']"
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['system:terminaltype:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['system:terminaltype:export']"
+            type="warning"
+            plain
+            icon="Download"
+            @click="handleExport"
+            v-hasPermi="['system:terminaltype:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
@@ -70,48 +78,69 @@
     <el-table v-loading="loading" :data="terminaltypeList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="columns[0].visible"/>
-    <el-table-column label="终端类型编码" align="center" prop="typeCode" width="120" v-if="columns[1].visible"/>
-    <el-table-column label="终端类型名称" align="center" prop="typeName" width="120" v-if="columns[2].visible"/>
+      <el-table-column label="终端类型编码" align="center" prop="typeCode" width="120" v-if="columns[1].visible"/>
+      <el-table-column label="终端类型名称" align="center" prop="typeName" width="120" v-if="columns[2].visible"/>
       <el-table-column label="状态" align="center" prop="status" v-if="columns[3].visible">
         <template #default="scope">
           <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
         </template>
       </el-table-column>
-    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[4].visible"/>
-    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
-      <template #default="scope">
-        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:terminaltype:edit']">修改</el-button>
-        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:terminaltype:remove']">删除</el-button>
-      </template>
-    </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[4].visible"/>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
+        <template #default="scope">
+          <el-tooltip content="修改" placement="top" >
+            <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:terminaltype:edit']"></el-button>
+          </el-tooltip>
+          <el-tooltip content="删除" placement="top" >
+            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:terminaltype:remove']"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
     </el-table>
-    
+
     <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total>0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改终端类型对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="terminaltypeRef" :model="form" :rules="rules" label-width="150px">
-        <el-form-item label="终端类型名称" prop="typeName">
-          <el-input v-model="form.typeName" placeholder="请输入终端类型名称" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in sys_normal_disable"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
+      <el-form ref="terminaltypeRef" :model="form" :rules="rules" label-width="100px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="终端类型编码" prop="typeCode">
+              <el-input v-model="form.typeCode" placeholder="请输入终端类型编码" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="终端类型名称" prop="typeName">
+              <el-input v-model="form.typeName" placeholder="请输入终端类型名称" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="状态" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio
+                    v-for="dict in sys_normal_disable"
+                    :key="dict.value"
+                    :label="parseInt(dict.value)"
+                >{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -124,9 +153,9 @@
 </template>
 
 <script setup name="Terminaltype">
-    import {listTerminaltype, addTerminaltype, delTerminaltype, getTerminaltype, updateTerminaltype } from "@/api/system/terminaltype";
+import {listTerminaltype, addTerminaltype, delTerminaltype, getTerminaltype, updateTerminaltype } from "@/api/system/terminaltype";
 
-    const { proxy } = getCurrentInstance();
+const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const terminaltypeList = ref([]);

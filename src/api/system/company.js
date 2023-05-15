@@ -42,3 +42,10 @@ export function delCompany(id) {
     method: 'delete'
   })
 }
+//查询所有有效公司
+export function listAllCompany() {
+  return request({
+    url: '/system/company/list-all',
+    method: 'get'
+  })
+}

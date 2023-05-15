@@ -10,6 +10,57 @@
                @keyup.enter="handleQuery"
             />
          </el-form-item>
+        <el-form-item label="所属系统" prop="systemId">
+          <el-select
+              v-model="queryParams.systemId"
+              placeholder="请选择所属系统"
+              clearable
+              style="width: 200px"
+              @change="dataSystemSelectChange"
+          >
+            <el-option
+                v-for="sys in systemOptions"
+                :key="sys.id"
+                :label="sys.systemName"
+                :value="sys.id"
+                :disabled="sys.status == 1"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="系统模块" prop="moduleId">
+          <el-select
+              v-model="queryParams.moduleId"
+              placeholder="请选择系统模块"
+              clearable
+              style="width: 200px"
+          >
+            <el-option
+                v-for="mod in moduleOptions"
+                :key="mod.id"
+                :label="mod.moduleName"
+                :value="mod.id"
+                :disabled="mod.status == 1"
+            />
+          </el-select>
+        </el-form-item><el-form-item label="终端类型" prop="systemId">
+        <el-select
+            v-model="queryParams.terminalTypeId"
+            placeholder="请选择终端类型"
+            clearable
+            style="width: 200px"
+        >
+          <el-option
+              v-for="item in terminalOptions"
+              :key="item.id"
+              :label="item.typeName"
+              :value="item.id"
+              :disabled="item.status == 1"
+          />
+        </el-select>
+      </el-form-item>
+
+
+
          <el-form-item label="状态" prop="status">
             <el-select v-model="queryParams.status" placeholder="菜单状态" clearable style="width: 200px">
                <el-option
@@ -77,9 +128,15 @@
          </el-table-column>
          <el-table-column label="操作" align="center" width="210" class-name="small-padding fixed-width">
             <template #default="scope">
-               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:menu:edit']">修改</el-button>
-               <el-button link type="primary" icon="Plus" @click="handleAdd(scope.row)" v-hasPermi="['system:menu:add']">新增</el-button>
-               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:menu:remove']">删除</el-button>
+              <el-tooltip content="修改" placement="top" >
+                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:menu:edit']"></el-button>
+              </el-tooltip>
+              <el-tooltip content="新增" placement="top" >
+                <el-button link type="primary" icon="Plus" @click="handleAdd(scope.row)" v-hasPermi="['system:menu:add']"></el-button>
+              </el-tooltip>
+              <el-tooltip content="删除" placement="top" >
+                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:menu:remove']"></el-button>
+              </el-tooltip>
             </template>
          </el-table-column>
       </el-table>
@@ -88,6 +145,11 @@
       <el-dialog :title="title" v-model="open" width="680px" append-to-body>
          <el-form ref="menuRef" :model="form" :rules="rules" label-width="100px">
             <el-row>
+              <el-col :span="24">
+                <el-form-item label="菜单名称" prop="menuName">
+                  <el-input v-model="form.menuName" placeholder="请输入菜单名称" />
+                </el-form-item>
+              </el-col>
                <el-col :span="24">
                   <el-form-item label="上级菜单">
                      <el-tree-select
@@ -109,7 +171,7 @@
                      </el-radio-group>
                   </el-form-item>
                </el-col>
-               <el-col :span="24" v-if="form.menuType != 'F'">
+               <el-col :span="12" v-if="form.menuType != 'F'">
                   <el-form-item label="菜单图标" prop="icon">
                      <el-popover
                         placement="bottom-start"
@@ -135,18 +197,65 @@
                      </el-popover>
                   </el-form-item>
                </el-col>
-               <el-col :span="12">
-                  <el-form-item label="菜单名称" prop="menuName">
-                     <el-input v-model="form.menuName" placeholder="请输入菜单名称" />
-                  </el-form-item>
-               </el-col>
+              <el-col :span="12">
+                <el-form-item label="所属系统" prop="systemId">
+                  <el-select v-model="form.systemId" @change="addSystemSelectChange">
+                    <el-option
+                        v-for="item in systemOptions"
+                        :key="item.id"
+                        :label="item.systemName"
+                        :value="item.id"
+                        :disabled="item.status == 1"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="系统模块" prop="moduleId">
+                  <el-select v-model="form.moduleId">
+                    <el-option
+                        v-for="item in moduleForAddOptions"
+                        :key="item.id"
+                        :label="item.moduleName"
+                        :value="item.id"
+                        :disabled="item.status == 1"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="终端类型" prop="moduleId">
+                  <el-select v-model="form.terminalTypeId">
+                    <el-option
+                        v-for="item in terminalOptions"
+                        :key="item.id"
+                        :label="item.typeName"
+                        :value="item.id"
+                        :disabled="item.status == 1"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item prop="perms">
+                  <el-input v-model="form.perms" placeholder="请输入权限字符" maxlength="100" />
+                  <template #label>
+                        <span>
+                           <el-tooltip content="控制器中定义的权限字符，如：v-hasPermi'['system:role:edit']'"  placement="top">
+                              <el-icon><question-filled /></el-icon>
+                           </el-tooltip>
+                           权限字符
+                        </span>
+                  </template>
+                </el-form-item>
+              </el-col>
                <el-col :span="12">
                   <el-form-item label="显示排序" prop="orderNum">
-                     <el-input-number v-model="form.orderNum" controls-position="right" :min="0" />
+                     <el-input-number v-model="form.orderNum" controls-position="right" :min="1" />
                   </el-form-item>
                </el-col>
                <el-col :span="12" v-if="form.menuType != 'F'">
-                  <el-form-item>
+                  <el-form-item prop="isFrame">
                      <template #label>
                         <span>
                            <el-tooltip content="选择是外链则路由地址需要以`http(s)://`开头" placement="top">
@@ -160,7 +269,7 @@
                      </el-radio-group>
                   </el-form-item>
                </el-col>
-               <el-col :span="12" v-if="form.menuType != 'F'">
+               <el-col :span="24" v-if="form.menuType != 'F'">
                   <el-form-item prop="path">
                      <template #label>
                         <span>
@@ -184,19 +293,6 @@
                         </span>
                      </template>
                      <el-input v-model="form.component" placeholder="请输入组件路径" />
-                  </el-form-item>
-               </el-col>
-               <el-col :span="12" v-if="form.menuType != 'M'">
-                  <el-form-item>
-                     <el-input v-model="form.perms" placeholder="请输入权限标识" maxlength="100" />
-                     <template #label>
-                        <span>
-                           <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)" placement="top">
-                              <el-icon><question-filled /></el-icon>
-                           </el-tooltip>
-                           权限字符
-                        </span>
-                     </template>
                   </el-form-item>
                </el-col>
                <el-col :span="12" v-if="form.menuType == 'C'">
@@ -284,9 +380,17 @@ import SvgIcon from "@/components/SvgIcon";
 import IconSelect from "@/components/IconSelect";
 import { ClickOutside as vClickOutside } from 'element-plus'
 
+import { listAllSystem } from "@/api/system/system";
+import { listAvailableModule } from "@/api/system/module";
+import { listAllTerminal} from "@/api/system/terminaltype";
+
 const { proxy } = getCurrentInstance();
 const { sys_show_hide, sys_normal_disable } = proxy.useDict("sys_show_hide", "sys_normal_disable");
 
+const systemOptions = ref(undefined);
+const moduleOptions = ref(undefined);
+const moduleForAddOptions = ref(undefined);
+const terminalOptions = ref(undefined);
 const menuList = ref([]);
 const open = ref(false);
 const loading = ref(true);
@@ -302,22 +406,73 @@ const data = reactive({
   form: {},
   queryParams: {
     menuName: undefined,
+    systemId: undefined,
+    moduleId: undefined,
+    terminalTypeId: undefined,
     visible: undefined
   },
   rules: {
     menuName: [{ required: true, message: "菜单名称不能为空", trigger: "blur" }],
+    systemId: [{ required: true, message: "所属系统不能为空", trigger: "blur" }],
+    moduleId: [{ required: true, message: "系统模块不能为空", trigger: "blur" }],
+    terminalTypeId: [{ required: true, message: "终端类型不能为空", trigger: "blur" }],
     orderNum: [{ required: true, message: "菜单顺序不能为空", trigger: "blur" }],
+    perms: [{ required: true, message: "权限字符不能为空", trigger: "blur" }],
     path: [{ required: true, message: "路由地址不能为空", trigger: "blur" }]
   },
 });
 
 const { queryParams, form, rules } = toRefs(data);
+/** 查询系统数据 */
+function getSystemOptions() {
+  listAllSystem().then(response => {
+    systemOptions.value = response.data;
+  });
+};
+
+/** 选择系统触发模块选择 */
+function dataSystemSelectChange(value) {
+  queryParams.value.moduleId = undefined;
+  moduleOptions.value = undefined;
+  if(!value){
+    return;
+  }
+  const qryParams = {
+    systemId: value,
+  }
+  listAvailableModule(qryParams).then(response => {
+    moduleOptions.value = response.data;
+  });
+}
+/** 查询终端类型数据 */
+function getTerminalOptions() {
+  listAllTerminal().then(response => {
+    terminalOptions.value = response.data;
+  });
+};
+
+/** 新增或修改选择系统触发模块选择 */
+function addSystemSelectChange(value) {
+  form.value.moduleId = undefined;
+  moduleForAddOptions.value = undefined;
+  if (!value) {
+    return;
+  }
+  let qryParams = {
+    systemId: value,
+  }
+  listAvailableModule(qryParams).then(response => {
+    moduleForAddOptions.value = response.data;
+    //默认第一个
+    form.value.moduleId = moduleForAddOptions.value[0].id;
+  });
+}
 
 /** 查询菜单列表 */
 function getList() {
   loading.value = true;
   listMenu(queryParams.value).then(response => {
-    menuList.value = proxy.handleTree(response.data, "id");
+    menuList.value = response.data
     loading.value = false;
   });
 }
@@ -401,6 +556,13 @@ function toggleExpandAll() {
 /** 修改按钮操作 */
 async function handleUpdate(row) {
   reset();
+  //查询列表
+  const qryParams = {
+    systemId: row.systemId,
+  }
+  listAvailableModule(qryParams).then(response => {
+    moduleForAddOptions.value = response.data;
+  });
   await getTreeselect();
   getMenu(row.id).then(response => {
     form.value = response.data;
@@ -438,5 +600,7 @@ function handleDelete(row) {
   }).catch(() => {});
 }
 
+getSystemOptions();
+getTerminalOptions()
 getList();
 </script>

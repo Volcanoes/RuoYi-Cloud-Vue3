@@ -42,3 +42,11 @@ export function delSystem(id) {
     method: 'delete'
   })
 }
+//查询所有系统
+export function listAllSystem() {
+    return request({
+      url: '/system/system/list-all',
+      method: 'get'
+    })
+}
+

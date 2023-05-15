@@ -3,27 +3,27 @@
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
       <el-form-item label="企业编码" prop="orgCode">
         <el-input
-          v-model="queryParams.orgCode"
-          placeholder="请输入企业编码"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.orgCode"
+            placeholder="请输入企业编码"
+            clearable
+            @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="企业名称" prop="orgName">
         <el-input
-          v-model="queryParams.orgName"
-          placeholder="请输入企业名称"
-          clearable
-          @keyup.enter="handleQuery"
+            v-model="queryParams.orgName"
+            placeholder="请输入企业名称"
+            clearable
+            @keyup.enter="handleQuery"
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option
-            v-for="dict in sys_normal_disable"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+              v-for="dict in sys_normal_disable"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
           />
         </el-select>
       </el-form-item>
@@ -36,40 +36,40 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="Plus"
-          @click="handleAdd"
-          v-hasPermi="['system:org:add']"
+            type="primary"
+            plain
+            icon="Plus"
+            @click="handleAdd"
+            v-hasPermi="['system:org:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
-          icon="Edit"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:org:edit']"
+            type="success"
+            plain
+            icon="Edit"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['system:org:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          plain
-          icon="Delete"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:org:remove']"
+            type="danger"
+            plain
+            icon="Delete"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['system:org:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="Download"
-          @click="handleExport"
-          v-hasPermi="['system:org:export']"
+            type="warning"
+            plain
+            icon="Download"
+            @click="handleExport"
+            v-hasPermi="['system:org:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
@@ -78,8 +78,8 @@
     <el-table v-loading="loading" :data="orgList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="columns[0].visible"/>
-    <el-table-column label="企业编码" align="center" prop="orgCode" width="120" v-if="columns[1].visible"/>
-    <el-table-column label="企业名称" align="center" prop="orgName" width="120" v-if="columns[2].visible"/>
+      <el-table-column label="企业编码" align="center" prop="orgCode" width="120" v-if="columns[1].visible"/>
+      <el-table-column label="企业名称" align="center" prop="orgName" width="180" v-if="columns[2].visible"/>
       <el-table-column label="企业图标" align="center" prop="icon" width="120" v-if="columns[3].visible">
         <template #default="scope">
           <image-preview :src="scope.row.icon" :width="30" :height="30"/>
@@ -100,47 +100,69 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-    <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[7].visible"/>
-    <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
-      <template #default="scope">
-        <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:org:edit']">修改</el-button>
-        <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:org:remove']">删除</el-button>
-      </template>
-    </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" width="120" v-if="columns[7].visible"/>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed = "right" width="150">
+        <template #default="scope">
+          <el-tooltip content="修改" placement="top" >
+            <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:org:edit']"></el-button>
+          </el-tooltip>
+          <el-tooltip content="删除" placement="top" >
+            <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:org:remove']"></el-button>
+          </el-tooltip>
+        </template>
+      </el-table-column>
     </el-table>
-    
+
     <pagination
-      v-show="total>0"
-      :total="total"
-      v-model:page="queryParams.pageNum"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
+        v-show="total>0"
+        :total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="getList"
     />
 
     <!-- 添加或修改企业管理对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="orgRef" :model="form" :rules="rules" label-width="150px">
-        <el-form-item label="企业编码" prop="orgCode">
-          <el-input v-model="form.orgCode" placeholder="请输入企业编码" />
-        </el-form-item>
-        <el-form-item label="企业名称" prop="orgName">
-          <el-input v-model="form.orgName" placeholder="请输入企业名称" />
-        </el-form-item>
-        <el-form-item label="企业图标" prop="icon">
-          <image-upload v-model="form.icon"/>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in sys_normal_disable"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
-        </el-form-item>
+      <el-form ref="orgRef" :model="form" :rules="rules" label-width="100px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="企业编码" prop="orgCode">
+              <el-input v-model="form.orgCode" placeholder="请输入企业编码" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="企业名称" prop="orgName">
+              <el-input v-model="form.orgName" placeholder="请输入企业名称" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="企业图标" prop="icon">
+              <image-upload v-model="form.icon"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="状态" prop="status">
+              <el-radio-group v-model="form.status">
+                <el-radio
+                    v-for="dict in sys_normal_disable"
+                    :key="dict.value"
+                    :label="parseInt(dict.value)"
+                >{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="备注" prop="remark">
+              <el-input v-model="form.remark" placeholder="请输入备注" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -153,9 +175,9 @@
 </template>
 
 <script setup name="Org">
-    import {listOrg, addOrg, delOrg, getOrg, updateOrg } from "@/api/system/org";
+import {listOrg, addOrg, delOrg, getOrg, updateOrg } from "@/api/system/org";
 
-    const { proxy } = getCurrentInstance();
+const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const orgList = ref([]);

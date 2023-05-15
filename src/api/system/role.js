@@ -117,3 +117,10 @@ export function deptTreeSelect(id) {
     method: 'get'
   })
 }
+//获取所有角色
+export function listAllRoles() {
+  return request({
+    url: '/system/role/list-all',
+    method: 'get'
+  })
+}

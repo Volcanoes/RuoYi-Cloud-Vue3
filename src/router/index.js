@@ -103,6 +103,20 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/system/account-auth',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:account:edit'],
+    children: [
+      {
+        path: 'role/:accountId(\\d+)',
+        component: () => import('@/views/system/account/authRole'),
+        name: 'AuthRole1',
+        meta: { title: '分配角色', activeMenu: '/system/account' }
+      }
+    ]
+  },
+  {
     path: '/system/role-auth',
     component: Layout,
     hidden: true,

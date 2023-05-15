@@ -42,3 +42,12 @@ export function delModule(id) {
     method: 'delete'
   })
 }
+
+// 查询系统模块列表
+export function listAvailableModule(query) {
+  return request({
+    url: '/system/module/list-by-system',
+    method: 'get',
+    params: query
+  })
+}
