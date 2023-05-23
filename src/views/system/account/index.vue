@@ -28,13 +28,12 @@
       </el-col>
       <!--用户数据-->
       <el-col :span="20" :xs="24">
-        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+        <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
           <el-form-item label="账户名称" prop="name">
             <el-input
                 v-model="queryParams.name"
                 placeholder="请输入账户名称"
                 clearable
-                style="width: 180px"
                 @keyup.enter="handleQuery"
             />
           </el-form-item>
@@ -43,7 +42,6 @@
                 v-model="queryParams.companyId"
                 placeholder="请选择所属公司"
                 clearable
-                style="width: 180px"
             >
               <el-option
                   v-for="item in companyOptions"
@@ -58,7 +56,6 @@
                 v-model="queryParams.phone"
                 placeholder="请输入手机号码"
                 clearable
-                style="width: 180px"
                 @keyup.enter="handleQuery"
             />
           </el-form-item>
@@ -67,7 +64,6 @@
                 v-model="queryParams.workNo"
                 placeholder="请输入工号"
                 clearable
-                style="width: 180px"
                 @keyup.enter="handleQuery"
             />
           </el-form-item>
@@ -76,7 +72,6 @@
                 v-model="queryParams.workEmail"
                 placeholder="请输入工作邮箱"
                 clearable
-                style="width: 180px"
                 @keyup.enter="handleQuery"
             />
           </el-form-item>
@@ -423,6 +418,8 @@ function getList() {
     accountList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  }).catch(() => {
+    loading.value = false;
   });
 }
 
@@ -545,7 +542,7 @@ function handleExport() {
 /** 跳转角色分配 */
 function handleAuthRole(row) {
   const id = row.id;
-  router.push("/system/account-auth/role/" + id);
+  router.push("/platform/account-auth/role/" + id);
 };
 
 getList();

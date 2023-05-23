@@ -1,17 +1,16 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
          <el-form-item label="部门名称" prop="deptName">
             <el-input
                v-model="queryParams.deptName"
                placeholder="请输入部门名称"
                clearable
-               style="width: 200px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
          <el-form-item label="状态" prop="status">
-            <el-select v-model="queryParams.status" placeholder="部门状态" clearable style="width: 200px">
+            <el-select v-model="queryParams.status" placeholder="部门状态" clearable >
                <el-option
                   v-for="dict in sys_normal_disable"
                   :key="dict.value"
@@ -135,8 +134,8 @@
                      <el-radio-group v-model="form.status">
                         <el-radio
                            v-for="dict in sys_normal_disable"
-                           :key="dict.value"
-                           :label="dict.value"
+                           :key="parseInt(dict.value)"
+                           :label="parseInt(dict.value)"
                         >{{ dict.label }}</el-radio>
                      </el-radio-group>
                   </el-form-item>
@@ -208,7 +207,7 @@ function reset() {
     leader: undefined,
     phone: undefined,
     email: undefined,
-    status: "0"
+    status: 0
   };
   proxy.resetForm("deptRef");
 }

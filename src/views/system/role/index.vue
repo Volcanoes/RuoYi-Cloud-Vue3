@@ -1,12 +1,11 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" v-show="showSearch" :inline="true" label-width="68px">
+      <el-form :model="queryParams" ref="queryRef" v-show="showSearch" :inline="true" label-width="68px" class="qry-parms">
          <el-form-item label="角色名称" prop="roleName">
             <el-input
                v-model="queryParams.roleName"
                placeholder="请输入角色名称"
                clearable
-               style="width: 200px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -15,7 +14,6 @@
                v-model="queryParams.roleCode"
                placeholder="请输入角色编码"
                clearable
-               style="width: 200px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -24,7 +22,6 @@
               v-model="queryParams.systemId"
               placeholder="请选择所属系统"
               clearable
-              style="width: 200px"
               @change="dataSystemSelectChange"
           >
             <el-option
@@ -40,7 +37,6 @@
               v-model="queryParams.moduleId"
               placeholder="请选择系统模块"
               clearable
-              style="width: 200px"
           >
             <el-option
                 v-for="mod in moduleOptions"
@@ -55,7 +51,6 @@
                v-model="queryParams.status"
                placeholder="角色状态"
                clearable
-               style="width: 200px"
             >
                <el-option
                   v-for="dict in sys_normal_disable"
@@ -457,6 +452,10 @@ function handleUpdate(row) {
     open.value = true;
     nextTick(() => {
       roleMenu.then((res) => {
+        console.log(res);
+        console.log(menuOptions.value);
+        console.log(res.checkedKeys);
+
         let checkedKeys = res.checkedKeys;
         checkedKeys.forEach((v) => {
           nextTick(() => {

@@ -1,12 +1,11 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px" class="qry-parms">
          <el-form-item label="参数名称" prop="configName">
             <el-input
                v-model="queryParams.configName"
                placeholder="请输入参数名称"
                clearable
-               style="width: 240px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -15,7 +14,6 @@
                v-model="queryParams.configKey"
                placeholder="请输入参数键名"
                clearable
-               style="width: 240px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -115,8 +113,12 @@
          </el-table-column>
          <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
             <template #default="scope">
-               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:config:edit']" >修改</el-button>
-               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:config:remove']">删除</el-button>
+              <el-tooltip content="修改" placement="top" >
+                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:config:edit']" ></el-button>
+              </el-tooltip>
+              <el-tooltip content="删除" placement="top" >
+                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:config:remove']"></el-button>
+              </el-tooltip>
             </template>
          </el-table-column>
       </el-table>

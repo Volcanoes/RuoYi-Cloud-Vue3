@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
       <el-form-item label="模块编码" prop="moduleCode">
         <el-input
             v-model="queryParams.moduleCode"
@@ -39,9 +39,9 @@
         <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option
               v-for="dict in sys_normal_disable"
-              :key="dict.value"
+              :key="parseInt(dict.value)"
               :label="dict.label"
-              :value="dict.value"
+              :value="parseInt(dict.value)"
           />
         </el-select>
       </el-form-item>
@@ -292,6 +292,8 @@ function getList() {
     moduleList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  }).catch(() => {
+    loading.value = false;
   });
 }
 
@@ -309,7 +311,7 @@ function reset() {
     moduleName: null,
     systemId: null,
     isShow: null,
-    status: null,
+    status: 0,
     routeUrl: null,
     sort: null,
     createBy: null,

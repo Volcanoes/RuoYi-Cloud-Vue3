@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
       <el-form-item label="系统编码" prop="systemCode">
         <el-input
             v-model="queryParams.systemCode"
@@ -216,6 +216,8 @@ function getList() {
     systemList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  }).catch(() => {
+    loading.value = false;
   });
 }
 
@@ -231,7 +233,7 @@ function reset() {
     id: null,
     systemCode: null,
     systemName: null,
-    status: null,
+    status: 0,
     sort: null,
     createBy: null,
     createTime: null,

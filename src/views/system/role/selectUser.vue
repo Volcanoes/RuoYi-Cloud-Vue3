@@ -11,6 +11,21 @@
                @keyup.enter="handleQuery"
             />
          </el-form-item>
+        <el-form-item label="所属公司" prop="companyId">
+          <el-select
+              v-model="queryParams.companyId"
+              placeholder="请选择所属公司"
+              clearable
+              style="width: 180px"
+          >
+            <el-option
+                v-for="item in companyOptions"
+                :key="item.id"
+                :label="item.companyName"
+                :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
          <el-form-item label="手机号码" prop="phone">
             <el-input
                v-model="queryParams.phone"
@@ -27,8 +42,10 @@
       </el-form>
       <el-row>
          <el-table @row-click="clickRow" ref="refTable" :data="accountList" @selection-change="handleSelectionChange" height="260px">
-            <el-table-column type="selection" width="55"></el-table-column>
+           <el-table-column type="selection" width="55"></el-table-column>
            <el-table-column label="账户名称" prop="name" :show-overflow-tooltip="true" />
+           <el-table-column label="所属公司" align="center" prop="company.companyName" width="150" :show-overflow-tooltip='true' />
+           <el-table-column label="所属部门" align="center" prop="dept.deptName" width="120" />
            <el-table-column label="工号" prop="workNo" :show-overflow-tooltip="true" />
            <el-table-column label="工作邮箱" prop="workEmail" :show-overflow-tooltip="true" />
            <el-table-column label="手机号码" prop="phone" :show-overflow-tooltip="true" />
@@ -66,8 +83,8 @@
 </template>
 
 <script setup name="SelectUser">
-import { authUserSelectAll, unallocatedUserList } from "@/api/system/role";
-
+import { authAccountSelectAll, unallocatedAccountList } from "@/api/system/role";
+import {listAllCompany} from "@/api/system/company";
 const props = defineProps({
   roleId: {
     type: [Number, String]
@@ -80,16 +97,24 @@ const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 const accountList = ref([]);
 const visible = ref(false);
 const total = ref(0);
-const userIds = ref([]);
+const accountIds = ref([]);
+const companyOptions = ref(undefined);
 
 const queryParams = reactive({
   pageNum: 1,
   pageSize: 10,
   roleId: undefined,
   name: undefined,
+  companyId: null,
   phone: undefined
 });
 
+/** 查询有效公司 */
+function getCompanyOptions() {
+  listAllCompany().then(response => {
+    companyOptions.value = response.data;
+  });
+}
 // 显示弹框
 function show() {
   queryParams.roleId = props.roleId;
@@ -102,11 +127,11 @@ function clickRow(row) {
 }
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  userIds.value = selection.map(item => item.userId);
+  accountIds.value = selection.map(item => item.id);
 }
 // 查询表数据
 function getList() {
-  unallocatedUserList(queryParams).then(res => {
+  unallocatedAccountList(queryParams).then(res => {
     accountList.value = res.rows;
     total.value = res.total;
   });
@@ -125,12 +150,12 @@ const emit = defineEmits(["ok"]);
 /** 选择授权用户操作 */
 function handleSelectUser() {
   const roleId = queryParams.roleId;
-  const uIds = userIds.value.join(",");
+  const uIds = accountIds.value.join(",");
   if (uIds == "") {
     proxy.$modal.msgError("请选择要分配的用户");
     return;
   }
-  authUserSelectAll({ roleId: roleId, userIds: uIds }).then(res => {
+  authAccountSelectAll({ roleId: roleId, accountIds: uIds }).then(res => {
     proxy.$modal.msgSuccess(res.msg);
     if (res.code === 200) {
       visible.value = false;
@@ -138,7 +163,7 @@ function handleSelectUser() {
     }
   });
 }
-
+getCompanyOptions();
 defineExpose({
   show,
 });

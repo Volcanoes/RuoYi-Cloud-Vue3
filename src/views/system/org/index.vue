@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
       <el-form-item label="企业编码" prop="orgCode">
         <el-input
             v-model="queryParams.orgCode"
@@ -228,6 +228,8 @@ function getList() {
   listOrg(queryParams.value).then(response => {
     orgList.value = response.rows;
     total.value = response.total;
+    loading.value = false;
+  }).catch(() => {
     loading.value = false;
   });
 }

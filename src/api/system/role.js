@@ -68,43 +68,43 @@ export function delRole(id) {
 // 查询角色已授权用户列表
 export function allocatedUserList(query) {
   return request({
-    url: '/system/role/authUser/allocatedList',
+    url: '/system/role/authAccount/allocatedList',
     method: 'get',
     params: query
   })
 }
 
 // 查询角色未授权用户列表
-export function unallocatedUserList(query) {
+export function unallocatedAccountList(query) {
   return request({
-    url: '/system/role/authUser/unallocatedList',
+    url: '/system/role/authAccount/unallocatedList',
     method: 'get',
     params: query
   })
 }
 
 // 取消用户授权角色
-export function authUserCancel(data) {
+export function authAccountCancel(data) {
   return request({
-    url: '/system/role/authUser/cancel',
+    url: '/system/role/authAccount/cancel',
     method: 'put',
     data: data
   })
 }
 
 // 批量取消用户授权角色
-export function authUserCancelAll(data) {
+export function authAccountCancelAll(data) {
   return request({
-    url: '/system/role/authUser/cancelAll',
+    url: '/system/role/authAccount/cancelAll',
     method: 'put',
     params: data
   })
 }
 
 // 授权用户选择
-export function authUserSelectAll(data) {
+export function authAccountSelectAll(data) {
   return request({
-    url: '/system/role/authUser/selectAll',
+    url: '/system/role/authAccount/selectAll',
     method: 'put',
     params: data
   })

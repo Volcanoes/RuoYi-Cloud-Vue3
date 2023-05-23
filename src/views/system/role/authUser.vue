@@ -2,7 +2,7 @@
 <template>
    <div class="app-container">
       <el-form :model="queryParams" ref="queryRef" v-show="showSearch" :inline="true">
-         <el-form-item label="用户名称" prop="name">
+         <el-form-item label="账户名称" prop="name">
             <el-input
                v-model="queryParams.name"
                placeholder="请输入用户名称"
@@ -11,6 +11,21 @@
                @keyup.enter="handleQuery"
             />
          </el-form-item>
+        <el-form-item label="所属公司" prop="companyId">
+          <el-select
+              v-model="queryParams.companyId"
+              placeholder="请选择所属公司"
+              clearable
+              style="width: 180px"
+          >
+            <el-option
+                v-for="item in companyOptions"
+                :key="item.id"
+                :label="item.companyName"
+                :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
          <el-form-item label="手机号码" prop="phone">
             <el-input
                v-model="queryParams.phone"
@@ -60,9 +75,11 @@
       <el-table v-loading="loading" :data="accountList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
          <el-table-column label="账户名称" prop="name" :show-overflow-tooltip="true" />
+         <el-table-column label="所属公司" align="center" prop="company.companyName" width="150" :show-overflow-tooltip='true' />
+         <el-table-column label="所属部门" align="center" prop="dept.deptName" width="120" />
          <el-table-column label="工号" prop="workNo" :show-overflow-tooltip="true" />
-         <el-table-column label="工作邮箱" prop="workEmail" :show-overflow-tooltip="true" />
-         <el-table-column label="手机号码" prop="phone" :show-overflow-tooltip="true" />
+         <el-table-column label="工作邮箱" prop="workEmail" width="150" :show-overflow-tooltip="true" />
+         <el-table-column label="手机号码" prop="phone" width="120" :show-overflow-tooltip="true" />
          <el-table-column label="头像" align="center" prop="avatar" width="120">
            <template #default="scope">
              <image-preview :src="scope.row.avatar" :width="30" :height="30"/>
@@ -78,7 +95,7 @@
                <span>{{ parseTime(scope.row.createTime) }}</span>
             </template>
          </el-table-column>
-         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+         <el-table-column label="操作" align="center" class-name="small-padding fixed-width" fixed="right" width="150">
             <template #default="scope">
                <el-button link type="primary" icon="CircleClose" @click="cancelAuthUser(scope.row)" v-hasPermi="['system:role:remove']">取消授权</el-button>
             </template>
@@ -98,7 +115,8 @@
 
 <script setup name="AuthUser">
 import selectUser from "./selectUser";
-import { allocatedUserList, authUserCancel, authUserCancelAll } from "@/api/system/role";
+import {listAllCompany} from "@/api/system/company";
+import { allocatedUserList, authAccountCancel, authAccountCancelAll } from "@/api/system/role";
 
 const route = useRoute();
 const { proxy } = getCurrentInstance();
@@ -109,16 +127,24 @@ const loading = ref(true);
 const showSearch = ref(true);
 const multiple = ref(true);
 const total = ref(0);
-const userIds = ref([]);
+const accountIds = ref([]);
+const companyOptions = ref(undefined);
 
 const queryParams = reactive({
   pageNum: 1,
   pageSize: 10,
   roleId: route.params.roleId,
   name: undefined,
+  companyId: null,
   phone: undefined,
 });
 
+/** 查询有效公司 */
+function getCompanyOptions() {
+  listAllCompany().then(response => {
+    companyOptions.value = response.data;
+  });
+}
 /** 查询授权用户列表 */
 function getList() {
   loading.value = true;
@@ -145,7 +171,7 @@ function resetQuery() {
 }
 // 多选框选中数据
 function handleSelectionChange(selection) {
-  userIds.value = selection.map(item => item.userId);
+  accountIds.value = selection.map(item => item.id);
   multiple.value = !selection.length;
 }
 /** 打开授权用户表弹窗 */
@@ -155,7 +181,7 @@ function openSelectUser() {
 /** 取消授权按钮操作 */
 function cancelAuthUser(row) {
   proxy.$modal.confirm('确认要取消该用户"' + row.name + '"角色吗？').then(function () {
-    return authUserCancel({ userId: row.userId, roleId: queryParams.roleId });
+    return authAccountCancel({ accountId: row.id, roleId: queryParams.roleId });
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("取消授权成功");
@@ -164,14 +190,14 @@ function cancelAuthUser(row) {
 /** 批量取消授权按钮操作 */
 function cancelAuthUserAll(row) {
   const roleId = queryParams.roleId;
-  const uIds = userIds.value.join(",");
+  const uIds = accountIds.value.join(",");
   proxy.$modal.confirm("是否取消选中用户授权数据项?").then(function () {
-    return authUserCancelAll({ roleId: roleId, userIds: uIds });
+    return authAccountCancelAll({ roleId: roleId, accountIds: uIds });
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("取消授权成功");
   }).catch(() => {});
 }
-
+getCompanyOptions();
 getList();
 </script>

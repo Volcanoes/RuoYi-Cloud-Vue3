@@ -1,12 +1,11 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px" class="qry-parms">
          <el-form-item label="系统模块" prop="title">
             <el-input
                v-model="queryParams.title"
                placeholder="请输入系统模块"
                clearable
-               style="width: 240px;"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -15,7 +14,6 @@
                v-model="queryParams.operName"
                placeholder="请输入操作人员"
                clearable
-               style="width: 240px;"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -24,7 +22,6 @@
                v-model="queryParams.businessType"
                placeholder="操作类型"
                clearable
-               style="width: 240px"
             >
                <el-option
                   v-for="dict in sys_oper_type"
@@ -39,7 +36,6 @@
                v-model="queryParams.status"
                placeholder="操作状态"
                clearable
-               style="width: 240px"
             >
                <el-option
                   v-for="dict in sys_common_status"

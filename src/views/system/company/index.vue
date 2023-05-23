@@ -1,12 +1,11 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
       <el-form-item label="公司名称" prop="companyName">
         <el-input
             v-model="queryParams.companyName"
             placeholder="请输入公司名称"
             clearable
-            style="width: 240px"
             @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -15,7 +14,6 @@
             v-model="queryParams.businessLicenseNo"
             placeholder="请输入营业执照号"
             clearable
-            style="width: 240px"
             @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -24,7 +22,6 @@
             v-model="queryParams.legalPersonId"
             placeholder="请输入法人ID"
             clearable
-            style="width: 240px"
             @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -33,7 +30,6 @@
             v-model="queryParams.legalPersonName"
             placeholder="请输入法人姓名"
             clearable
-            style="width: 240px"
             @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -42,7 +38,6 @@
             v-model="queryParams.legalPersonPhone"
             placeholder="请输入法人联系电话"
             clearable
-            style="width: 240px"
             @keyup.enter="handleQuery"
         />
       </el-form-item>
@@ -303,6 +298,8 @@ function getList() {
   listCompany(queryParams.value).then(response => {
     companyList.value = response.rows;
     total.value = response.total;
+    loading.value = false;
+  }).catch(() => {
     loading.value = false;
   });
 }

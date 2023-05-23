@@ -58,3 +58,11 @@ export function delMenu(id) {
     method: 'delete'
   })
 }
+
+// 刷新字典缓存
+export function refreshPermsCache() {
+  return request({
+    url: '/system/menu/refresh-perms-cache',
+    method: 'put'
+  })
+}

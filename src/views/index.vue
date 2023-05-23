@@ -1,10 +1,9 @@
 <template>
-  <div class="dashboard-editor-container">
+  <div class=" app-container dashboard-editor-container">
 
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
     <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <line-chart :chart-data="lineChartData" />
+      <line-chart :chart-data="lineChartData.newVisitis" />
     </el-row>
 
     <el-row :gutter="32">
@@ -29,13 +28,13 @@
   </div>
 </template>
 
-<script>
+<script setup name = "Index">
 import LineChart from './dashboard/LineChart'
 import RaddarChart from './dashboard/RaddarChart'
 import PieChart from './dashboard/PieChart'
 import BarChart from './dashboard/BarChart'
 
-const lineChartData = {
+const lineChartData =  ref({
   newVisitis: {
     expectedData: [100, 120, 161, 134, 105, 160, 165],
     actualData: [120, 82, 91, 154, 162, 140, 145]
@@ -52,27 +51,7 @@ const lineChartData = {
     expectedData: [130, 140, 141, 142, 145, 150, 160],
     actualData: [120, 82, 91, 154, 162, 140, 130]
   }
-}
-
-export default {
-  name: 'Index',
-  components: {
-    LineChart,
-    RaddarChart,
-    PieChart,
-    BarChart
-  },
-  data() {
-    return {
-      lineChartData: lineChartData.newVisitis
-    }
-  },
-  methods: {
-    handleSetLineChartData(type) {
-      this.lineChartData = lineChartData[type]
-    }
-  }
-}
+})
 </script>
 
 <style lang="scss" scoped>

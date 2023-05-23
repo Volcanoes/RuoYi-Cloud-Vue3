@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
       <el-form-item label="终端类型编码" prop="typeCode">
         <el-input
             v-model="queryParams.typeCode"
@@ -108,39 +108,26 @@
 
     <!-- 添加或修改终端类型对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" append-to-body>
-      <el-form ref="terminaltypeRef" :model="form" :rules="rules" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="终端类型编码" prop="typeCode">
-              <el-input v-model="form.typeCode" placeholder="请输入终端类型编码" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="终端类型名称" prop="typeName">
-              <el-input v-model="form.typeName" placeholder="请输入终端类型名称" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="状态" prop="status">
-              <el-radio-group v-model="form.status">
-                <el-radio
-                    v-for="dict in sys_normal_disable"
-                    :key="dict.value"
-                    :label="parseInt(dict.value)"
-                >{{dict.label}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="备注" prop="remark">
-              <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+      <el-form ref="terminaltypeRef" :model="form" :rules="rules" label-width="120px">
+        <el-form-item label="终端类型编码" prop="typeCode">
+          <el-input v-model="form.typeCode" placeholder="请输入终端类型编码"/>
+        </el-form-item>
+        <el-form-item label="终端类型名称" prop="typeName">
+          <el-input v-model="form.typeName" placeholder="请输入终端类型名称"/>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio
+                v-for="dict in sys_normal_disable"
+                :key="dict.value"
+                :label="parseInt(dict.value)"
+            >{{ dict.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -204,6 +191,8 @@ function getList() {
     terminaltypeList.value = response.rows;
     total.value = response.total;
     loading.value = false;
+  }).catch(() => {
+    loading.value = false;
   });
 }
 
@@ -219,7 +208,7 @@ function reset() {
     id: null,
     typeCode: null,
     typeName: null,
-    status: null,
+    status: 0,
     createBy: null,
     createTime: null,
     updateBy: null,

@@ -103,7 +103,7 @@ export const dynamicRoutes = [
     ]
   },
   {
-    path: '/system/account-auth',
+    path: '/platform/account-auth',
     component: Layout,
     hidden: true,
     permissions: ['system:account:edit'],

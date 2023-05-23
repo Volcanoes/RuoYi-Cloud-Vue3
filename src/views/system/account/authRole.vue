@@ -77,7 +77,7 @@ function getRowKey(row) {
 };
 /** 关闭按钮 */
 function close() {
-  const obj = { path: "/system/account" };
+  const obj = { path: "/platform/account" };
   proxy.$tab.closeOpenPage(obj);
 };
 /** 提交按钮 */

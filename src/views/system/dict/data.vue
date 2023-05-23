@@ -1,6 +1,6 @@
 <template>
    <div class="app-container">
-      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch">
+      <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" class="qry-parms">
          <el-form-item label="字典名称" prop="dictType">
             <el-select v-model="queryParams.dictType" style="width: 200px">
                <el-option
@@ -16,7 +16,6 @@
                v-model="queryParams.dictLabel"
                placeholder="请输入字典标签"
                clearable
-               style="width: 200px"
                @keyup.enter="handleQuery"
             />
          </el-form-item>
@@ -24,9 +23,9 @@
             <el-select v-model="queryParams.status" placeholder="数据状态" clearable style="width: 200px">
                <el-option
                   v-for="dict in sys_normal_disable"
-                  :key="dict.value"
+                  :key="parseInt(dict.value)"
                   :label="dict.label"
-                  :value="dict.value"
+                  :value="parseInt(dict.value)"
                />
             </el-select>
          </el-form-item>
@@ -110,8 +109,12 @@
          </el-table-column>
          <el-table-column label="操作" align="center" width="160" class-name="small-padding fixed-width">
             <template #default="scope">
-               <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:dict:edit']">修改</el-button>
-               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dict:remove']">删除</el-button>
+              <el-tooltip content="修改" placement="top" >
+                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:dict:edit']"></el-button>
+              </el-tooltip>
+              <el-tooltip content="删除" placement="top" >
+                <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dict:remove']"></el-button>
+              </el-tooltip>
             </template>
          </el-table-column>
       </el-table>
@@ -261,7 +264,7 @@ function reset() {
     cssClass: undefined,
     listClass: "default",
     dictSort: 0,
-    status: "0",
+    status: 0,
     remark: undefined
   };
   proxy.resetForm("dataRef");
