@@ -26,7 +26,9 @@
          <el-table-column type="selection" :reserve-selection="true" width="55"></el-table-column>
          <el-table-column label="角色ID" align="center" prop="id" />
          <el-table-column label="角色名称" align="center" prop="roleName" />
-         <el-table-column label="角色编码" align="center" prop="roleKey" />
+         <el-table-column label="角色编码" align="center" prop="roleCode" />
+        <el-table-column label="所属系统" prop="systemName" :show-overflow-tooltip="true" width="150" />
+        <el-table-column label="系统模块" prop="moduleName" :show-overflow-tooltip="true" width="150" />
          <el-table-column label="创建时间" align="center" prop="createTime" width="180">
             <template #default="scope">
                <span>{{ parseTime(scope.row.createTime) }}</span>

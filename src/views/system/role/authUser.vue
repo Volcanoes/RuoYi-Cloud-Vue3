@@ -101,7 +101,13 @@
             </template>
          </el-table-column>
       </el-table>
-
+     <el-button
+         type="primary"
+         plain
+         icon="Plus"
+         @click="openSelectUser"
+         v-hasPermi="['system:role:add']"
+     >添加用户</el-button>
       <pagination
          v-show="total > 0"
          :total="total"

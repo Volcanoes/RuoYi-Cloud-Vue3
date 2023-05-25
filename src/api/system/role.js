@@ -124,3 +124,38 @@ export function listAllRoles() {
     method: 'get'
   })
 }
+
+// 根据角色ID查询菜单下拉树结构
+export function getBindRoles(menuId) {
+  return request({
+    url: '/system/role/get-bind-roles/' + menuId,
+    method: 'get'
+  })
+}
+
+// 删除菜单关联的角色，只支持单个删除
+export function delMenuRole(params) {
+  return request({
+    url: '/system/role/delete-menu-role',
+    method: 'delete',
+    params: params
+  })
+}
+
+// 根据menuId和条件查询角色列表
+export function menuUnallocatedList(query) {
+  return request({
+    url: '/system/role/auth-menu/unallocated-list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 菜单授权批量选择
+export function menuBatchAuthRoles(data) {
+  return request({
+    url: '/system/role/auth-menu/bath-auth',
+    method: 'put',
+    params: data
+  })
+}

@@ -37,6 +37,7 @@
               v-model="queryParams.moduleId"
               placeholder="请选择系统模块"
               clearable
+              :disabled="mouduleSelectDisabled"
           >
             <el-option
                 v-for="mod in moduleOptions"
@@ -120,12 +121,12 @@
       <!-- 表格数据 -->
       <el-table v-loading="loading" :data="roleList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
-         <el-table-column label="角色ID" prop="id" width="80" />
-         <el-table-column label="角色编码" prop="roleCode" :show-overflow-tooltip="true" width="120" />
-         <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
-         <el-table-column label="所属系统" prop="systemName" :show-overflow-tooltip="true" width="150" />
+         <el-table-column label="角色ID" align="center" prop="id" width="80" />
+         <el-table-column label="角色编码" align="center" prop="roleCode" :show-overflow-tooltip="true" width="140" />
+         <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="140" />
+         <el-table-column label="所属系统" align="center" prop="systemName" :show-overflow-tooltip="true" width="150" />
          <el-table-column label="系统模块" prop="moduleName" :show-overflow-tooltip="true" width="150" />
-         <el-table-column label="显示顺序" prop="roleSort" width="80" />
+         <el-table-column label="显示顺序" align="center" prop="roleSort" width="80" />
          <el-table-column label="状态" align="center" width="80">
             <template #default="scope">
                <el-switch
@@ -275,9 +276,9 @@ const menuNodeAll = ref(false);
 const deptExpand = ref(true);
 const deptNodeAll = ref(false);
 const deptOptions = ref([]);
-const openDataScope = ref(false);
 const menuRef = ref(null);
 const deptRef = ref(null);
+const mouduleSelectDisabled = ref(true);
 
 const data = reactive({
   form: {},
@@ -322,7 +323,9 @@ function getSystemOptions() {
 function dataSystemSelectChange(value) {
   queryParams.value.moduleId = undefined;
   moduleOptions.value = undefined;
+  //清空所属系统
   if(!value){
+    mouduleSelectDisabled.value = true;
     return;
   }
   const qryParams = {
@@ -330,6 +333,9 @@ function dataSystemSelectChange(value) {
   }
   listAvailableModule(qryParams).then(response => {
     moduleOptions.value = response.data;
+    if (response.data) {
+      mouduleSelectDisabled.value = false;
+    }
   });
 }
 

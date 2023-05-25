@@ -36,7 +36,6 @@
                 :key="sys.id"
                 :label="sys.systemName"
                 :value="sys.id"
-                :disabled="sys.status == 1"
             />
           </el-select>
         </el-form-item>
@@ -52,7 +51,6 @@
                 :key="mod.id"
                 :label="mod.moduleName"
                 :value="mod.id"
-                :disabled="mod.status == 1"
             />
           </el-select>
         </el-form-item><el-form-item label="终端类型" prop="systemId">
@@ -156,10 +154,10 @@
        <el-col :span="16" :xs="24">
          <div class="menu_edit">
            <span class="menu_detail">
-             <el-icon class="detail_icon"><Document /></el-icon>
+             <el-icon class="detail_icon" ><Document /></el-icon>
              菜单详情
            </span>
-           <div style="float: right;">
+           <div style="float: right;margin-right: 50px">
              <el-button type="primary" @click="isEdit = true" v-hasPermi="['system:menu:edit']" v-if="!isEdit">修 改</el-button>
              <el-button type="primary" @click="submitForm" v-hasPermi="['system:menu:edit']" v-if="isEdit">确 定</el-button>
              <el-button @click="cancel" v-hasPermi="['system:menu:edit']" v-if="isEdit">取 消</el-button>
@@ -403,13 +401,45 @@
              </el-radio-group>
            </el-form-item>
          </el-form>
+         <div class="menu_edit">
+           <span class="menu_detail">
+             <el-icon class="detail_icon"><Connection /></el-icon>
+             关联角色
+           </span>
+           <div style="float: right;margin-right: 50px">
+             <el-button type="primary" @click="openSelectRole" v-hasPermi="['system:menu:edit']" >添 加</el-button>
+           </div>
+         </div>
+         <el-table v-loading="roleLoading" :data="roleList" >
+           <el-table-column label="角色ID" align="center" prop="id"/>
+           <el-table-column label="角色编码" prop="roleCode" :show-overflow-tooltip="true" min-width="140" />
+           <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" min-width="120" />
+           <el-table-column label="显示顺序" align="center" prop="roleSort" width="100"/>
+           <el-table-column label="状态" align="center" prop="status">
+             <template #default="scope">
+               <dict-tag :options="sys_normal_disable" :value="scope.row.status"/>
+             </template>
+           </el-table-column>
+           <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="150" fixed = "right">
+             <template #default="scope">
+               <el-tooltip content="删除" placement="top">
+                 <el-button link type="primary" icon="Delete" @click="handleDeleteRole(form.id,scope.row)" v-hasPermi="['system:role:remove']"></el-button>
+               </el-tooltip>
+             </template>
+           </el-table-column>
+         </el-table>
+
        </el-col>
      </el-row>
+     <select-role ref="selectRef" :menuId="form.id" @ok="handleQuery" />
    </div>
 </template>
 
 <script setup name="Menu">
-import { addMenu, delMenu, getMenu, listMenu, updateMenu,refreshPermsCache } from "@/api/system/menu";
+import selectRole from "./selectRole";
+
+import { addMenu, delMenu, getMenu, listMenu, updateMenu,refreshPermsCache} from "@/api/system/menu";
+import { getBindRoles,delMenuRole} from "@/api/system/role";
 import SvgIcon from "@/components/SvgIcon";
 import IconSelect from "@/components/IconSelect";
 import { ClickOutside as vClickOutside } from 'element-plus'
@@ -436,9 +466,8 @@ const showChooseIcon = ref(false);
 const iconSelectRef = ref(null);
 const mouduleSelectDisabled = ref(true);
 const addMouduleSelectDisabled = ref(true);
-
-const apiData = ref( [{systemPrefixPath: '2312312', requestApi: '21423r',requestMethod: '3214124'},
-  {systemPrefixPath: '2312312', requestApi: '21423r',requestMethod: '3214124'}]);
+const roleLoading = ref(true);
+const roleList = ref([]);
 
 const data = reactive({
   form: {},
@@ -633,6 +662,10 @@ async function queryDetail(row) {
     moduleForAddOptions.value = response.data;
   });
    getTreeselect();
+  getBindRoles(row.id).then(response => {
+    roleList.value = response.data
+    roleLoading.value = false;
+  });
   await getMenu(row.id).then(response => {
     form.value = response.data;
   });
@@ -671,6 +704,26 @@ function handleDelete(row) {
   }).catch(() => {});
 }
 
+/** 删除关联的角色操作 */
+function handleDeleteRole(menuId,row) {
+  console.log(row)
+  proxy.$modal.confirm('是否确认删除关联的角色[' + row.roleName + ']?').then(function() {
+    const parms = {
+      menuId: menuId,
+      roleId: row.id
+    }
+    console.log(parms)
+    return delMenuRole(parms);
+  }).then(() => {
+    roleLoading.value = true;
+    getBindRoles(menuId).then(response => {
+      roleList.value = response.data
+      roleLoading.value = false;
+    });
+    proxy.$modal.msgSuccess("删除成功");
+  }).catch(() => {});
+}
+
 function deleteApi(item, index) {
   form.value.apis.splice(index, 1);
 }
@@ -694,6 +747,11 @@ function handleRefreshPermsCache() {
     proxy.$modal.msgSuccess("刷新成功");
   }).catch(() => {
   });
+}
+
+/** 打开授权用户表弹窗 */
+function openSelectRole() {
+  proxy.$refs["selectRef"].show();
 }
 
 getSystemOptions();
@@ -741,5 +799,6 @@ getList();
   margin-right: 5px;
   position:relative;
   top:-2px;
+  color: #599CF8;
 }
 </style>
