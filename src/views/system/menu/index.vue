@@ -214,14 +214,14 @@
            <el-form-item label="菜单图标" prop="icon" v-if="form.menuType != 'F'">
              <el-popover
                  placement="bottom-start"
-                 :width="540"
+                 :width="450"
                  v-model:visible="showChooseIcon"
                  trigger="click"
                  @show="showSelectIcon"
                  :disabled="!isEdit"
              >
                <template #reference>
-                 <el-input v-model="form.icon" placeholder="点击选择图标" @blur="showSelectIcon"
+                 <el-input v-model="form.icon" placeholder="点击选择图标"
                            v-click-outside="hideSelectIcon" readonly>
                    <template #prefix>
                      <svg-icon
